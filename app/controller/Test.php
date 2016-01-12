@@ -8,10 +8,11 @@
 
 namespace App\Controller;
 
+use \Lib\Controller\Controller;
 
-class Test {
+class Test extends Controller {
 
     public function run() {
-        echo __CLASS__;
+        echo 'hello world';
     }
 } 

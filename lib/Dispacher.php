@@ -25,6 +25,6 @@ class Dispacher {
 
         $obj = new $controller();
 
-        $obj->run();
+        $obj->control();
     }
 }
