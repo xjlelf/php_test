@@ -33,9 +33,9 @@ class Autoloader {
         $class_name = array_pop($piece);
 
         $path = '';
-        do {
+        while(count($piece) > 1) {
             $path = strtolower(array_pop($piece)) . DIRECTORY_SEPARATOR . $path;
-        } while(count($piece) > 1);
+        }
 
         $path = $path . ucfirst($class_name) . '.php';
 

@@ -14,5 +14,6 @@ class Test extends Controller {
 
     public function run() {
         echo 'hello world';
+        echo array(111);
     }
 } 

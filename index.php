@@ -1,5 +1,7 @@
 <?php
 
+error_reporting(E_ALL^(E_NOTICE));
+
 define('LIB', './lib/');
 define('APP', './app/');
 
@@ -17,3 +19,5 @@ require_once(LIB . 'Autoloader.php');
 require_once(LIB . 'Dispacher.php');
 
 \Lib\Dispacher::get()->dispach();
+
+//register_shutdown_function(array(\Lib\Shut::instance(), 'shut'));
