@@ -16,6 +16,9 @@ require_once(LIB . 'Autoloader.php');
 
 \Lib\Autoloader::get();
 
+//配置文件路径设置
+\Lib\Config::setConfigNamespace('\\App\\Config');
+
 require_once(LIB . 'Dispacher.php');
 
 \Lib\Dispacher::get()->dispach();

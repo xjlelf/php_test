@@ -2,13 +2,14 @@
 
 namespace App\Controller;
 
+use App\Model\UserModel;
 use Lib\Controller\Controller;
-use App\Model\Users;
 
 class User extends Controller {
 
     public function run() {
-        $users = new Users();
-        pr($users->getInfo());
+        $users = new UserModel();
+        $user_info = $users->getUserById(1);
+        pr($user_info);die();
     }
 }
