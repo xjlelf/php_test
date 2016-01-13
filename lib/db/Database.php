@@ -35,6 +35,11 @@ class Database {
         return $result;
     }
 
+    public function write($sql, $params = array()) {
+        $sth = $this->prepare($sql, $params);
+        return $sth->rowCount();
+    }
+
     protected function prepare($sql, $params) {
         $connection = $this->getConnection();
 

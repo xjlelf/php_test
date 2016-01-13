@@ -6,6 +6,7 @@ namespace Lib;
 class Dispacher {
 
     private $path;
+    private $request;
 
     public static function get() {
         static $single = NULL;
@@ -14,7 +15,10 @@ class Dispacher {
     }
 
     private function __CONSTRUCT() {
-        $this->path = $_SERVER['REQUEST_URI'];
+        $this->path = strtok($_SERVER['REQUEST_URI'], '?');
+        $this->request['GET'] = $_GET;
+        $this->request['POST'] = $_POST;
+        $this->request['REQUEST'] = $_REQUEST;
     }
 
     public function dispach() {
@@ -23,7 +27,7 @@ class Dispacher {
 
         $controller = '\\App\\Controller\\' . ucfirst($class);
 
-        $obj = new $controller();
+        $obj = new $controller($this->request);
 
         $obj->control();
     }

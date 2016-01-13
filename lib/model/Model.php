@@ -34,4 +34,18 @@ class Model {
         }
         return $patern;
     }
+
+    public function save($data) {
+        $fields_arr = array_keys($data);
+        $fields_str = implode(',', $fields_arr);
+
+        foreach ($fields_arr as &$v) {
+            $v = ':' . $v;
+        }
+        $fields_value_arr = implode(',', $fields_arr);
+
+        $sql = "INSERT INTO {$this->table} ({$fields_str}) VALUES ({$fields_value_arr})";
+        $rs = $this->db->write($sql, $data);
+        return $rs;
+    }
 } 
