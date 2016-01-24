@@ -48,4 +48,19 @@ class Model {
         $rs = $this->db->write($sql, $data);
         return $rs;
     }
+
+    public function update($data, $where) {
+        $fields_arr = array_keys($data);
+        foreach ($fields_arr as &$v) {
+            $v = '`' . $v . '` = :' . $v;
+        }
+        $fields_str = implode(',', $fields_arr);
+
+        $fields_where_str = $this->getCondition($where);
+
+        $sql = "UPDATE {$this->table} SET {$fields_str} WHERE {$fields_where_str}";
+
+        $exec_data = array_merge($data, $where);
+        return $this->db->write($sql, $exec_data);
+    }
 } 

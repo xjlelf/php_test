@@ -12,6 +12,8 @@ if (!function_exists('pr')) {
     }
 }
 
+ini_set('date.timezone','Asia/Shanghai');
+
 require_once(LIB . 'Autoloader.php');
 
 \Lib\Autoloader::get();
