@@ -6,7 +6,7 @@ use Lib\Model\Model;
 
 class UserModel extends Model {
 
-    protected $table = 'managers';
+    protected $table = 'users';
 
     public function getUserById($id) {
         $query = array(
