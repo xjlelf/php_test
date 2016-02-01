@@ -2,7 +2,12 @@
 
 require_once('./lib/queue/core/index.php');
 
+set_error_handler('customError');
+
 $queue_name = $options['name'];
+
+GLOBAL $log_name;
+$log_name = $queue_name;
 
 setPid($queue_name);
 
@@ -20,7 +25,7 @@ while (true) {
                 die("ERROR:fork failed");
             } else if ($pid) {
                 $pids[$i] = $pid;
-//                trigger_error("new pid=$pid");
+                trigger_error("new pid=$pid");
             } else {
                 start($queue_name);
                 exit;
@@ -28,18 +33,18 @@ while (true) {
         }
     }
 
-//    declare ( ticks = 1 );
-//    pcntl_signal(SIGTERM, "sig_handler");
-//    pcntl_signal(SIGHUP, "sig_handler");
-//    pcntl_signal(SIGINT, "sig_handler");
-//
-//    $pid = pcntl_waitpid(- 1, $status, WNOHANG);
-//    if ($pid <= 0) {
-//        // 没有子进程退出
-//        sleep(2);
-//    } else {
-//        trigger_error("process $pid is exit");
-//    }
+    declare ( ticks = 1 );
+    pcntl_signal(SIGTERM, "sig_handler");
+    pcntl_signal(SIGHUP, "sig_handler");
+    pcntl_signal(SIGINT, "sig_handler");
+
+    $pid = pcntl_waitpid(-1, $status, WNOHANG);
+    if ($pid <= 0) {
+        // 没有子进程退出
+        sleep(2);
+    } else {
+        trigger_error("process $pid is exit");
+    }
 }
 
 function start($queue_name) {
@@ -68,25 +73,36 @@ function setPid($queue_name) {
     }
 }
 
-//function sig_handler() {
-//    GLOBAL $pids;
-//    foreach ($pids as $pid) {
-//        trigger_error("kill pid $pid");
-//
-//        if (!posix_kill($pid, 0)) {
-//            trigger_error("process $pid has been exit(zombe)");
-//            continue;
-//        }
-//
-//        $ret = posix_kill($pid, SIGINT);
-//        if ($ret) {
-//            $status = "";
-//            pcntl_waitpid($pid, $status);
-//            trigger_error("process $pid is exit");
-//        } else {
-//            trigger_error("send signal to process $pid failed", E_USER_ERROR);
-//        }
-//    }
-//
-//    exit();
-//}
+function sig_handler() {
+    GLOBAL $pids;
+    foreach ($pids as $pid) {
+        trigger_error("kill pid $pid");
+
+        if (!posix_kill($pid, 0)) {
+            trigger_error("process $pid has been exit(zombe)");
+            continue;
+        }
+
+        $ret = posix_kill($pid, SIGINT);
+        if ($ret) {
+            $status = "";
+            pcntl_waitpid($pid, $status);
+            trigger_error("process $pid is exit");
+        } else {
+            trigger_error("send signal to process $pid failed");
+        }
+    }
+
+    exit();
+}
+
+function customError($errno, $errstr, $errfile, $errline) {
+    GLOBAL $log_name;
+    switch ($errno) {
+        default:
+            $err_str = '[' . date('Y-m-d H:i:s') . '] ' . basename($errfile) . '(' . $errline . '): ' . $errstr . "\n";
+            $log_path = APP . "log/queue/debug/" .  date('Y-m') . "/" . "{$log_name}_" . date('Y-m-d') . ".log";
+            file_put_contents($log_path, $err_str);
+            break;
+    }
+}

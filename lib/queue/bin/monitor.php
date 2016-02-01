@@ -3,9 +3,9 @@
 require_once('./lib/queue/core/index.php');
 
 // 安装信号处理函数
-//declare (ticks = 1);
-//pcntl_signal(SIGTERM, "sigHandler");
-//pcntl_signal(SIGHUP, "sigHandler");
+declare (ticks = 1);
+pcntl_signal(SIGTERM, "sigHandler");
+pcntl_signal(SIGHUP, "sigHandler");
 
 $queue_name = 'login';
 
@@ -35,6 +35,8 @@ if (file_exists($monitor_file)) {
     }
 }
 
+daemon();
+
 $pid = posix_getpid();
 if (!file_exists($monitor_file)) {
     mkdir(dirname($monitor_file), 0777, 1);
@@ -44,16 +46,30 @@ file_put_contents($monitor_file, $pid);
 GLOBAL $running;
 $running = true;
 while ($running) {
-    start($queue_name);
+    check($queue_name);
     sleep(1);
 }
 
+function check($queue_name) {
+    $pidfile = APP . "log/monitor/$queue_name.pid";
+    if (file_exists($pidfile)) {
+        $pid = file_get_contents($pidfile);
+//        debugLog("check {$queue_name} pid = $pid");
+        if (!intval($pid) || !posix_kill($pid, 0)) {
+            debugLog("{$queue_name} pid = $pid is kill");
+            start($queue_name);
+        }
+    } else {
+        start($queue_name);
+    }
+}
+
 function start($queue_name) {
+    debugLog("start $queue_name");
     $log_path = APP . "log/queue/debug/" .  date('Y-m') . "/";
     if (!file_exists($log_path)) {
         mkdir($log_path, 0777, 1);
     }
-//    debugLog("start $queue_name");
     $fp = popen("php ./lib/queue/core/main.php --name=$queue_name >> " . $log_path . "{$queue_name}_" . date('Y-m-d') . ".log 2>&1 &", 'r');
     pclose($fp);
 }
@@ -77,18 +93,18 @@ function stop($queue_name) {
     }
 }
 
-//function sigHandler($iSigno) {
-//    global $monitor_file;
-//    switch ($iSigno) {
-//        case SIGTERM :
-//            stop('login');
-//            file_put_contents($monitor_file, "0");
-//            exit ();
-//            break;
-//        case SIGHUP :
-//            stop('login');
-//            break;
-//        default :
-//            break;
-//    }
-//}
+function sigHandler($iSigno) {
+    global $monitor_file;
+    switch ($iSigno) {
+        case SIGTERM :
+            stop('login');
+            file_put_contents($monitor_file, "0");
+            exit ();
+            break;
+        case SIGHUP :
+            stop('login');
+            break;
+        default :
+            break;
+    }
+}

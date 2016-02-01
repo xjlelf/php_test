@@ -42,3 +42,20 @@ function getOptions() {
 
     return $options;
 }
+
+/**
+ * 摆脱终端，使进程成为新的会话组长
+ */
+function daemon() {
+    $pid = pcntl_fork();
+    if ($pid == - 1) {
+        die ( "fork failed for daemon" );
+    } else if ($pid) {
+        exit();
+    } else {
+        //摆脱终端，使进程成为新的会话组长
+        if (posix_setsid() == - 1) {
+            die ("could not detach from terminal");
+        }
+    }
+}

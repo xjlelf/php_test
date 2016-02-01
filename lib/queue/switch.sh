@@ -25,13 +25,13 @@ while [ $# -gt 0 ];do
                 action="stop"
             ;;
             *)
-                error_print "invalid action ${1} "
+                echo "invalid action ${1} "
                 exit
             ;;
         esac
         ;;
         *)
-            error_print "noting happen"
+            echo "noting happen"
             exit
         ;;
     esac
@@ -48,7 +48,7 @@ case $action in
         work_stop "$cmd"
     ;;
     *)
-        error_print "invalid action ${1} ";
+        echo "invalid action ${1} ";
         exit
     ;;
 esac
